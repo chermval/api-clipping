@@ -2,7 +2,7 @@ import { IsNotEmpty } from 'class-validator';
 
 export class CreateClippingDto {
   @IsNotEmpty()
-  libro: string;
+  book: string;
 
   @IsNotEmpty()
   author: string;
