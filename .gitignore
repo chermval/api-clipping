@@ -1,0 +1,17 @@
+# node
+package-lock.json
+
+# Dependency directories
+node_modules/
+
+# directories
+dist/
+
+# TypeScript v1 declaration files
+typings/
+# TypeScript cache
+*.tsbuildinfo
+
+# dotenv environment variables file
+.env
+.env.tests
