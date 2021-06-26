@@ -12,6 +12,9 @@ export class ClippingsUtils {
   private TYPE_BOOKMARK = 'marcador';
   private TYPE_HIGHLIGHT = 'subrayado';
   private TYPE_NOTE = 'nota';
+  private PAGE = 'página';
+  private POSITION = 'posición';
+
   private createClippingsDto: CreateClippingDto[] = [];
 
   constructor() {}
@@ -38,6 +41,7 @@ export class ClippingsUtils {
     let clippingInfo;
     let description;
 
+    // get info from lines with data
     if (clippingLines.length > 0) {
       bookInfo = this.getBookInfo(clippingLines[0]);
       clippingInfo = this.getClippingInfo(clippingLines[1]);
@@ -55,13 +59,19 @@ export class ClippingsUtils {
     }
   }
 
+  /*
+  Get array of all lines of one Clipping in file
+  */
   getClippingsLinesData(clipping: string): string[] {
-    // get array with lines of Clipping
     return clipping.split(this.SEPARATION_LINE).map(function (line) {
       return line.trim();
     });
   }
 
+  /*
+  Get array of all lines with data of one Clipping,
+  lines without data are removed. 
+  */
   removeEmptyLines(clippingLines: string[]): string[] {
     //filter only the lines that have information
     return clippingLines.filter(function (e) {
@@ -69,15 +79,37 @@ export class ClippingsUtils {
     });
   }
 
+  /*
+  Get array of data from line that have info from book,
+  Example: 
+    input (line) : Escuadrón (Spanish Edition) (Sanderson, Brandon)
+    return: [ 
+      Escuadrón (Spanish Edition),
+      Sanderson, Brandon
+    ]
+  */
   getBookInfo(clippingLineBookInfo: string): string[] {
-    const bookInfo: string[] = clippingLineBookInfo.split(this.SEPARATION_INFO_BOOK);
+    const bookInfo: string[] = clippingLineBookInfo.split(
+      // eslint-disable-next-line prettier/prettier
+      this.SEPARATION_INFO_BOOK
+    );
     bookInfo[0] = bookInfo[0].trim();
 
-    // Get author name
+    // Get author name and clean data
     bookInfo[1] = bookInfo[1].replace(')', '').trim();
     return bookInfo;
   }
 
+  /*
+  Get array of data from line that have info from clipping,
+  Example: 
+    input (line) : - La subrayado en la posición 333-444 | Añadido el sábado, 1 de junio de 2019 0:23:55
+    return: [ 
+      HIGHLIGHT,
+      posición 333-444,
+      Añadido el sábado, 1 de junio de 2019 0:23:55
+    ]
+  */
   getClippingInfo(clippingLineClippingInfo: string): string[] {
     const clippingInfo: string[] = clippingLineClippingInfo
       .split(this.SEPARATION_INFO_CLIPPING)
@@ -86,10 +118,14 @@ export class ClippingsUtils {
       });
 
     if (clippingInfo.length <= 2) {
+      // If clipping info only have position data or only page data:
+      //  create new string with the data from position or page.
       clippingInfo.splice(1, 0, this.getPagePosition(clippingInfo[0]));
     } else {
+      // If clipping info have position data and page data:
+      // save position data and page data in same string
       clippingInfo[1] =
-        this.getPagePosition(clippingInfo[0]) + ', ' + clippingInfo[1];
+        this.getPagePosition(clippingInfo[0]) + ' - ' + clippingInfo[1];
     }
 
     clippingInfo[0] = this.getType(clippingInfo[0]);
@@ -97,13 +133,16 @@ export class ClippingsUtils {
     return clippingInfo;
   }
 
+  /*
+  Get position data or page data from clippings info line[0]
+  */
   getPagePosition(clippingInfoTypePosition: string): string {
-    if (clippingInfoTypePosition.includes('página')) {
+    if (clippingInfoTypePosition.includes(this.PAGE)) {
       // eslint-disable-next-line prettier/prettier
-      return clippingInfoTypePosition.slice(clippingInfoTypePosition.indexOf('página'));
-    } else if (clippingInfoTypePosition.includes('posición')) {
+      return clippingInfoTypePosition.slice(clippingInfoTypePosition.indexOf(this.PAGE));
+    } else if (clippingInfoTypePosition.includes(this.POSITION)) {
       // eslint-disable-next-line prettier/prettier
-      return clippingInfoTypePosition.slice(clippingInfoTypePosition.indexOf('posición'));
+      return clippingInfoTypePosition.slice(clippingInfoTypePosition.indexOf(this.POSITION));
     }
   }
 
