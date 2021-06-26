@@ -1,4 +1,10 @@
-import { Logger, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import {
+  Get,
+  Logger,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { Controller } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Clipping } from './clipping.entity';
@@ -10,10 +16,17 @@ export class ClippingsController {
 
   constructor(private clippingsService: ClippingsService) {}
 
+  //Get all clippings
+  @Get()
+  findAll() {
+    this.logger.verbose(`Getting all workout`);
+    return this.clippingsService.findAll();
+  }
+
   //Save workout registry
   @Post()
   @UseInterceptors(FileInterceptor('file'))
-  save(@UploadedFile() file: Express.Multer.File): Promise<Clipping> {
+  save(@UploadedFile() file: Express.Multer.File): Promise<Clipping[]> {
     this.logger.verbose(`Creating clipping`);
     return this.clippingsService.save(file);
   }

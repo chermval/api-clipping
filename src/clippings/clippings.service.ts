@@ -13,9 +13,18 @@ export class ClippingsService {
     private clippingsUtils: ClippingsUtils,
   ) {}
 
-  save(file: Express.Multer.File): Promise<Clipping> {
-    const createClippingDto: CreateClippingDto =
-      this.clippingsUtils.getCreateClippingDto(file.buffer.toString());
-    return this.clippingsRepository.saveRecord(createClippingDto);
+  async findAll(): Promise<Clipping[]> {
+    const workouts = await this.clippingsRepository.find({
+      order: { book: 'DESC' },
+    });
+
+    return workouts;
+  }
+
+  save(file: Express.Multer.File): Promise<Clipping[]> {
+    const createClippingDto: CreateClippingDto[] =
+      this.clippingsUtils.getCreateClippingsDto(file.buffer.toString());
+
+    return this.clippingsRepository.saveRecords(createClippingDto);
   }
 }

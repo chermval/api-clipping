@@ -4,19 +4,25 @@ import { Clipping } from './clipping.entity';
 
 @EntityRepository(Clipping)
 export class ClippingsRepository extends Repository<Clipping> {
-  async saveRecord(clippingDto: CreateClippingDto): Promise<Clipping> {
-    const { book, author, type, description, position, date } = clippingDto;
-    const clipping = this.create({
-      book,
-      author,
-      type,
-      description,
-      position,
-      date,
-    });
+  async saveRecords(clippingsDto: CreateClippingDto[]): Promise<Clipping[]> {
+    const clippings: Clipping[] = [];
 
-    await this.save(clipping);
+    for (const clippingDto of clippingsDto) {
+      const { book, author, type, description, position, date } = clippingDto;
+      const clipping = this.create({
+        book,
+        author,
+        type,
+        description,
+        position,
+        date,
+      });
 
-    return clipping;
+      await this.save(clipping);
+
+      clippings.push(clipping);
+    }
+
+    return clippings;
   }
 }
